@@ -1,0 +1,59 @@
+name: "Kubernetes Cluster with Ubuntu Container"
+description: "This blueprint creates a Kubernetes cluster on Azure and deploys an Ubuntu container, with automatic bursting to Amazon AWS in case of an overloaded container"
+
+services:
+  - name: "Kubernetes Cluster"
+    type: "Kubernetes"
+    cloud: "Azure 1"
+    region: "West US 2"
+    nodes:
+      - name: "Master Node"
+        count: 1
+        type: "Standard_DS2_v2"
+      - name: "Worker Node"
+        count: 2
+        type: "Standard_DS2_v2"
+    auto_scaling:
+      - name: "Kubernetes Cluster Auto-Scaling"
+        metric: "cpu_utilization"
+        threshold: 80
+        min_replicas: 1
+        max_replicas: 5
+        scaling_interval: 60
+    network:
+      - name: "Kubernetes Cluster VNET"
+        cidr: "10.0.0.0/16"
+        subnets:
+          - name: "Master Subnet"
+            cidr: "10.0.1.0/24"
+            type: "master"
+          - name: "Worker Subnet"
+            cidr: "10.0.2.0/24"
+            type: "worker"
+  - name: "Ubuntu Container"
+    type: "Docker"
+    image: "ubuntu:latest"
+    ports:
+      - "8080:80"
+    environment:
+      - "NODE_ENV=production"
+    resources:
+      - "cpu: 1000m"
+      - "memory: 512Mi"
+    auto_scaling:
+      - name: "Ubuntu Container Auto-Scaling"
+        metric: "cpu_utilization"
+        threshold: 80
+        min_replicas: 1
+        max_replicas: 5
+        scaling_interval: 60
+        burst:
+          - cloud: "AWS 1"
+            region: "us-west-2"
+            min_replicas: 1
+            max_replicas: 5
+            scaling_interval: 60
+            scaling_down_policy:
+              - metric: "cpu_utilization"
+                threshold: 50
+                cooldown: 300
