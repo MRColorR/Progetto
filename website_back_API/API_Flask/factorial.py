@@ -2,6 +2,10 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+@app.route('/')
+def index():
+    return "Hello, world! this is the / endpoint of the API and it used to test it"
+
 @app.route('/factorial', methods=['POST'])
 def factorial():
     data = request.get_json()
