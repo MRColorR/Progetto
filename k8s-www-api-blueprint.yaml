@@ -1,0 +1,113 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: factorial-web
+  labels:
+    app: factorial-web
+spec:
+  selector:
+    app: factorial-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: factorial-api
+  labels:
+    app: factorial-api
+spec:
+  selector:
+    app: factorial-api
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factorial-web
+  labels:
+    app: factorial-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: factorial-web
+  template:
+    metadata:
+      labels:
+        app: factorial-web
+    spec:
+      containers:
+        - name: factorial-web
+          image: mrcolorrain/factorialwww:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factorial-api
+  labels:
+    app: factorial-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: factorial-api
+  template:
+    metadata:
+      labels:
+        app: factorial-api
+    spec:
+      containers:
+        - name: factorial-api
+          image: mrcolorrain/factorialapi:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: FLASK_APP
+              value: factorial.py
+          command: ["flask", "run", "--host=0.0.0.0"]
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: factorial-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /factorial
+            pathType: Prefix
+            pathRewrite: /factorial
+            backend:
+              service:
+                name: factorial-api
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: factorial-web
+                port:
+                  name: http
