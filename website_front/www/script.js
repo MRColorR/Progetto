@@ -18,10 +18,16 @@ function calculate() {
     },
     body: JSON.stringify({ number: number })
   })
-    .then(response => response.json())
+    .then(response => {
+      if (response.ok) {
+        return response.json()
+      } else {
+        throw new Error(response.statusText)
+      }
+    })
     .then(data => {
       var factorial = data.factorial;
       result.innerHTML = "The factorial of " + number + " is " + factorial;
-    });
+    })
+    .catch(error => console.log(error))
 }
-
