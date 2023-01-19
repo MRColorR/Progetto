@@ -2,5 +2,6 @@
 /CPM/*
 /gatling/*
 /JmeterLoadTest/apache-jmeter-5.5
+/JmeterLoadTest/temp
 /JmeterLoadTest/Report_HTML/*
 /JmeterLoadTest/jmeter.log
