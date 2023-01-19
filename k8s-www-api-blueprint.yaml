@@ -59,6 +59,10 @@ spec:
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi  
 
 ---
 apiVersion: apps/v1
@@ -86,6 +90,10 @@ spec:
             - name: FLASK_APP
               value: factorial.py
           command: ["flask", "run", "--host=0.0.0.0"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
 
 ---
 apiVersion: autoscaling/v2
