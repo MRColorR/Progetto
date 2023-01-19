@@ -11,7 +11,7 @@ function calculate() {
   var result = document.getElementById("result");
 
   // Make an AJAX call to the backend API
-  fetch('/factorial', {
+  fetch(`${window.location.origin.replace(/:\d+$/, "")}:30500/factorial`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

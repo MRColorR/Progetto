@@ -1,10 +1,8 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return "Hello, world! this is the / endpoint of the API and it used to test it"
+CORS(app)
 
 @app.route('/factorial', methods=['POST'])
 def factorial():
@@ -13,7 +11,7 @@ def factorial():
     if not number:
         return jsonify({'error': 'number is required'}), 400
     result = 1
-    for i in range(1, number+1):
+    for i in range(1, int(number)+1):
         result *= i
     return jsonify({'number': number, 'factorial': result})
 

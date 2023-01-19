@@ -28,7 +28,8 @@ spec:
     - name: http
       port: 5000
       targetPort: 5000
-  type: ClusterIP
+      nodePort: 30500
+  type: NodePort
 
 ---
 apiVersion: apps/v1
@@ -85,30 +86,3 @@ spec:
             - name: FLASK_APP
               value: factorial.py
           command: ["flask", "run", "--host=0.0.0.0"]
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: factorial-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /factorial
-            pathType: Prefix
-            pathRewrite: /factorial
-            backend:
-              service:
-                name: factorial-api
-                port:
-                  name: http
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: factorial-web
-                port:
-                  name: http
