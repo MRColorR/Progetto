@@ -115,7 +115,7 @@ spec:
           command: ["flask", "run", "--host=0.0.0.0"]
           resources:
             requests:
-              cpu: 256m
+              cpu: 128m
               memory: 256Mi
       affinity:
         nodeAffinity:
