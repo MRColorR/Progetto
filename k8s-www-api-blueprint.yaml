@@ -69,6 +69,18 @@ spec:
             requests:
               cpu: 100m
               memory: 256Mi  
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: node-type
+                  operator: In
+                  values:
+                  - burst
+              topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: apps/v1
@@ -106,6 +118,18 @@ spec:
             requests:
               cpu: 100m
               memory: 256Mi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: node-type
+                  operator: In
+                  values:
+                  - burst
+              topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: autoscaling/v2
