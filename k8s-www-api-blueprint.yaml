@@ -139,7 +139,7 @@ spec:
     kind: Deployment
     name: factorial-web
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -159,7 +159,7 @@ spec:
     kind: Deployment
     name: factorial-api
   minReplicas: 1
-  maxReplicas: 15
+  maxReplicas: 10
   metrics:
     - type: Resource
       resource:
