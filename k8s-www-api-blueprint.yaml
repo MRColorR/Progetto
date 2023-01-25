@@ -67,7 +67,7 @@ spec:
             periodSeconds: 5
           resources:
             requests:
-              cpu: 128m
+              cpu: 64m
               memory: 128Mi  
       affinity:
         nodeAffinity:
@@ -115,8 +115,8 @@ spec:
           command: ["flask", "run", "--host=0.0.0.0"]
           resources:
             requests:
-              cpu: 128m
-              memory: 256Mi
+              cpu: 64m
+              memory: 128Mi
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
