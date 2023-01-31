@@ -64,15 +64,16 @@ ssh-keygen -f kubekey -P ""
 
 # Add the public key to OpenStack
 openstack keypair create --public-key kubekey.pub kubekey
-
+sleep 1
 # Launch two Centos images. They will be used to install the K8s cluster.
 openstack server create --image centos7 --network kubenet --flavor d3 --key-name kubekey master1
+sleep 1
 openstack server create --image centos7 --network kubenet --flavor d3 --key-name kubekey worker1
-
+sleep 1
 # Obtain two floating IPs for the cluster nodes
 IPMASTER=$(openstack floating ip create public -f value -c name)
 IPWORKER=$(openstack floating ip create public -f value -c name)
-
+sleep 1
 # Add *kubesg* and the floating IPs to the cluster nodes
 openstack server add security group master1 kubesg
 openstack server add security group worker1 kubesg
