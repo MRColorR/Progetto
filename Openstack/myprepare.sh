@@ -4,10 +4,11 @@ source ./devstack/openrc admin admin
 # Download the latest Centos 7 cloud image and add it to the OpenStack image catalog.
 # The xz command is CPU intensive and will be extremely slow without nested
 # virtualization. Download the non-compressed image if in doubt.
-wget https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2.xz -O - | xz -d >centos7.qcow2
-openstack image create --file ./centos7.qcow2 --disk-format qcow2 --public centos7
-#wget -O centos8.qcow2 http://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2
-#openstack image create --file ./centos8.qcow2 --disk-format qcow2 --public centos8
+#wget https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2.xz -O - | xz -d >centos7.qcow2
+#openstack image create --file ./centos7.qcow2 --disk-format qcow2 --public centos7
+wget -O centos9.qcow2 https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20230123.0.x86_64.qcow2
+openstack image create --file ./centos9.qcow2 --disk-format qcow2 --public centos9stream
+
 
 # Create the kube project and user, and add necessary roles to the user.
 openstack project create kube
@@ -66,9 +67,9 @@ ssh-keygen -f kubekey -P ""
 openstack keypair create --public-key kubekey.pub kubekey
 sleep 1
 # Launch two Centos images. They will be used to install the K8s cluster.
-openstack server create --image centos7 --network kubenet --flavor d3 --key-name kubekey master1
+openstack server create --image centos9stream --network kubenet --flavor d3 --key-name kubekey master1
 sleep 1
-openstack server create --image centos7 --network kubenet --flavor d3 --key-name kubekey worker1
+openstack server create --image centos9stream --network kubenet --flavor d3 --key-name kubekey worker1
 sleep 1
 # Obtain two floating IPs for the cluster nodes
 IPMASTER=$(openstack floating ip create public -f value -c name)
