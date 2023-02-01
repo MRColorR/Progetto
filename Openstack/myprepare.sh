@@ -1,13 +1,20 @@
+read -r -p "Wich is the name of the site/cloud? this will affect the nodes hostnames (eg. a , b, cloud1, clouda, 1,...) " SITE
+
 # Use the OpenStack admin identity
 source ./devstack/openrc admin admin
 
 # Download the latest Centos 7 cloud image and add it to the OpenStack image catalog.
 # The xz command is CPU intensive and will be extremely slow without nested
 # virtualization. Download the non-compressed image if in doubt.
+
 #wget https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2.xz -O - | xz -d >centos7.qcow2
 #openstack image create --file ./centos7.qcow2 --disk-format qcow2 --public centos7
-wget -O centos9.qcow2 https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20230123.0.x86_64.qcow2
-openstack image create --file ./centos9.qcow2 --disk-format qcow2 --public centos9stream
+
+#wget -O centos9.qcow2 https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20230123.0.x86_64.qcow2
+#openstack image create --file ./centos9.qcow2 --disk-format qcow2 --public centos9stream
+
+wget -O debian10.qcow2 http://cdimage.debian.org/images/cloud/OpenStack/current-10/debian-10-openstack-amd64.qcow2
+openstack image create --file ./debian10.qcow2 --disk-format qcow2 --public debian10
 
 
 # Create the kube project and user, and add necessary roles to the user.
@@ -69,16 +76,16 @@ ssh-keygen -f kubekey -P ""
 openstack keypair create --public-key kubekey.pub kubekey
 sleep 1
 # Launch two Centos images. They will be used to install the K8s cluster.
-openstack server create --image centos9stream --network kubenet --flavor d3 --key-name kubekey master1a
+openstack server create --image debian10 --network kubenet --flavor d3 --key-name kubekey master$SITE
 sleep 1
-openstack server create --image centos9stream --network kubenet --flavor d3 --key-name kubekey worker1a
+openstack server create --image debian10 --network kubenet --flavor d3 --key-name kubekey worker$SITE
 sleep 1
 # Obtain two floating IPs for the cluster nodes
 IPMASTER=$(openstack floating ip create public -f value -c name)
 IPWORKER=$(openstack floating ip create public -f value -c name)
 sleep 1
 # Add *kubesg* and the floating IPs to the cluster nodes
-openstack server add security group master1 kubesg
-openstack server add security group worker1 kubesg
-openstack server add floating ip master1 $IPMASTER
-openstack server add floating ip worker1 $IPWORKER
+openstack server add security group master$SITE kubesg
+openstack server add security group worker$SITE kubesg
+openstack server add floating ip master$SITE $IPMASTER
+openstack server add floating ip worker$SITE $IPWORKER
