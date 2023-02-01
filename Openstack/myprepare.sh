@@ -18,9 +18,9 @@ openstack image create --file ./debian10.qcow2 --disk-format qcow2 --public debi
 
 
 # Create the kube project and user, and add necessary roles to the user.
-openstack project create kube
-openstack user create kube --project kube --password kube
-openstack role add --user kube --project kube member
+#openstack project create kube
+#openstack user create kube --project kube --password kube
+#openstack role add --user kube --project kube member
 #openstack role add --user kube --project kube load-balancer_member
 
 # Switch to the kube user/project identity
