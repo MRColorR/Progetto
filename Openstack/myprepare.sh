@@ -44,6 +44,8 @@ done << EOF
 TCP     22      SSH
 TCP     80      HTTP for testing
 TCP     443     HTTPS for testing
+TCP     30080   wwwProj
+TCP     30500   apiProj
 TCP     6443    Kubernetes API Server
 TCP     2379:2380       etcd server client API
 TCP     10250   Kubelet API
@@ -67,9 +69,9 @@ ssh-keygen -f kubekey -P ""
 openstack keypair create --public-key kubekey.pub kubekey
 sleep 1
 # Launch two Centos images. They will be used to install the K8s cluster.
-openstack server create --image centos9stream --network kubenet --flavor d3 --key-name kubekey master1
+openstack server create --image centos9stream --network kubenet --flavor d3 --key-name kubekey master1a
 sleep 1
-openstack server create --image centos9stream --network kubenet --flavor d3 --key-name kubekey worker1
+openstack server create --image centos9stream --network kubenet --flavor d3 --key-name kubekey worker1a
 sleep 1
 # Obtain two floating IPs for the cluster nodes
 IPMASTER=$(openstack floating ip create public -f value -c name)
