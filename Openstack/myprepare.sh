@@ -51,6 +51,8 @@ done << EOF
 TCP     22      SSH
 TCP     80      HTTP for testing
 TCP     443     HTTPS for testing
+TCP     9993    Zerotier-manage
+UDP     9993    Zerotier-connect
 TCP     30080   wwwProj
 TCP     30500   apiProj
 TCP     6443    Kubernetes API Server
