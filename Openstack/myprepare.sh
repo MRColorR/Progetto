@@ -1,4 +1,19 @@
-read -r -p "Wich is the name of the site/cloud? this will affect the nodes hostnames (eg. a , b, cloud1, clouda, 1,...) " SITE
+NAME1='master1a' ;
+NAME2='worker1a' ;
+INET='0'
+read -r -p "Wich is the name of the site/cloud? this will affect the nodes hostnames (eg. a , b, cloud1, cloud2, ...)"$'\n' SITE ;
+read -r -p "Internal network willi be like: 172.16.x.0/24. Wich is the number x (0-255) of the site/cloud internal network? This will affect the instances internal addesses"$'\n' INET ;
+read -r -p "Is this the site where the master for the k3s cluster wll be? Y/N? "$'\n' yn
+        case $yn in
+            [Yy]* )
+                NAME1="master$INET$SITE" ;
+                NAME2="worker$INET$SITE" ;;
+            [Nn]* ) 
+                NAME1="worker$INET$SITE" ;
+                NAME2="worker$INET$SITE""1" ;;
+            * ) printf "Please answer yes or no.";;
+        esac 
+printf "Ok, so the names and hostnames of the instances will be $NAME1 and $NAME2"$'\n';
 
 # Use the OpenStack admin identity
 source ./devstack/openrc admin admin
@@ -6,12 +21,6 @@ source ./devstack/openrc admin admin
 # Download the latest Centos 7 cloud image and add it to the OpenStack image catalog.
 # The xz command is CPU intensive and will be extremely slow without nested
 # virtualization. Download the non-compressed image if in doubt.
-
-#wget https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2.xz -O - | xz -d >centos7.qcow2
-#openstack image create --file ./centos7.qcow2 --disk-format qcow2 --public centos7
-
-#wget -O centos9.qcow2 https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20230123.0.x86_64.qcow2
-#openstack image create --file ./centos9.qcow2 --disk-format qcow2 --public centos9stream
 
 wget -O debian10.qcow2 http://cdimage.debian.org/images/cloud/OpenStack/current-10/debian-10-openstack-amd64.qcow2
 openstack image create --file ./debian10.qcow2 --disk-format qcow2 --public debian10
@@ -28,7 +37,7 @@ openstack image create --file ./debian10.qcow2 --disk-format qcow2 --public debi
 
 # Create the network for the K8s cluster nodes and connect it to *public*, the external network
 openstack network create kubenet
-openstack subnet create --subnet-range 172.16.0.0/24 --network kubenet --dns-nameserver 1.1.1.1 kubesubnet
+openstack subnet create --subnet-range "172.16.$INET.0/24" --network kubenet --dns-nameserver 1.1.1.1 kubesubnet
 openstack router create kuberouter
 openstack router set --external-gateway public kuberouter
 openstack router add subnet kuberouter kubesubnet
@@ -78,16 +87,16 @@ ssh-keygen -f kubekey -P ""
 openstack keypair create --public-key kubekey.pub kubekey
 sleep 1
 # Launch two Centos images. They will be used to install the K8s cluster.
-openstack server create --image debian10 --network kubenet --flavor d3 --key-name kubekey master$SITE
+openstack server create --image debian10 --network kubenet --flavor d3 --key-name kubekey $NAME1
 sleep 1
-openstack server create --image debian10 --network kubenet --flavor d3 --key-name kubekey worker$SITE
+openstack server create --image debian10 --network kubenet --flavor d3 --key-name kubekey $NAME2
 sleep 1
 # Obtain two floating IPs for the cluster nodes
-IPMASTER=$(openstack floating ip create public -f value -c name)
-IPWORKER=$(openstack floating ip create public -f value -c name)
+IP1=$(openstack floating ip create public -f value -c name)
+IP2=$(openstack floating ip create public -f value -c name)
 sleep 1
 # Add *kubesg* and the floating IPs to the cluster nodes
-openstack server add security group master$SITE kubesg
-openstack server add security group worker$SITE kubesg
-openstack server add floating ip master$SITE $IPMASTER
-openstack server add floating ip worker$SITE $IPWORKER
+openstack server add security group $NAME1 kubesg
+openstack server add security group $NAME2 kubesg
+openstack server add floating ip $NAME1 $IP1
+openstack server add floating ip $NAME2 $IP2
