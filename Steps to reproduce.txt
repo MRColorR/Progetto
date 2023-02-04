@@ -74,19 +74,24 @@ now using ping check that openstack1 and its instances can reach openstack2 and 
 
 you can ping them from each other and also any website by name (eg. google.com) or ip to check networking
 
-now proceed installing k3s on the master node and then make the worker join the cluster
-sudo apt install curl -y && curl -sfL https://get.k3s.io | sh -
+now proceed installing k3s on the master node making it advertise its floating ip so it could work in hybrid multi cloud environments.Then make the worker join the cluster
+sudo apt install curl -y && curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-external-ip <masterFloatingIP>" sh -
 after this , check if the master node of the cluster is up and running using:
 sudo kubectl get nodes
+check also the metric server status using:
+sudo kubectl get deployment,pods -n kube-system | grep metrics-server
+or
+sudo kubectl top nodes
  
 Now to get from the master node the token that will allow us to add the other worker nodes run:
 sudo cat /var/lib/rancher/k3s/server/node-token
 
-to chek if the candidate node can get the certificate on the master using the 6443 port use: curl -vk https://<masterip>/cacerts
+to chek if the candidate node can get the certificate on the master using the 6443 port use: curl -vk https://<masterFloatingIP>/cacerts
 
 now ssh again in the worker node on the same openstack and install the k3s agent passing the master's ip and the token
-sudo apt install curl -y && sudo curl -sfL https://get.k3s.io | K3S_URL="<masterFloatingIP>:6443" K3S_TOKEN="<token>" sh - 
-(also you ca do it after installing the entire k3s using sudo k3s agent -t <token> -s https://<masterFloatingIP>:6443 )
+sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=https://<masterFloatingIP>:6443 K3S_TOKEN="token" INSTALL_K3S_EXEC="--node-external-ip <workerFloatingIP>" sh -
+(also you ca do it after installing the entire k3s using sudo k3s agent -t <token> --server https://<masterFloatingIP>:6443 --node-external-ip <workerFloatingIP> -s
+)
 
 Add labels to each node on-prem:
 sudo kubectl label nodes master1a worker1a node-type=on-prem

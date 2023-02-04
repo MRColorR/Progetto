@@ -75,6 +75,7 @@ TCP     179     Calico BGP network
 TCP     9099    Calico felix (health check)
 UDP     8285    Flannel
 UDP     8472    Flannel
+UDP     51820   Wireguard
 TCP     6781:6784       Weave Net
 UDP     6783:6784       Weave Net
 EOF
