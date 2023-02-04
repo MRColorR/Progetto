@@ -90,7 +90,7 @@ to chek if the candidate node can get the certificate on the master using the 64
 
 now ssh again in the worker node on the same openstack and install the k3s agent passing the master's ip and the token
 sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=https://<masterFloatingIP>:6443 K3S_TOKEN="token" INSTALL_K3S_EXEC="--node-external-ip <workerFloatingIP>" sh -
-(also you ca do it after installing the entire k3s using sudo k3s agent -t <token> --server https://<masterFloatingIP>:6443 --node-external-ip <workerFloatingIP> -s
+(also you ca do it after installing the entire k3s using sudo k3s agent -t <token> --server https://<masterFloatingIP>:6443 --node-external-ip <workerFloatingIP>
 )
 
 Add labels to each node on-prem:
