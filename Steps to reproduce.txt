@@ -75,7 +75,7 @@ now using ping check that openstack1 and its instances can reach openstack2 and 
 you can ping them from each other and also any website by name (eg. google.com) or ip to check networking
 
 now proceed installing k3s on the master node making it advertise its floating ip so it could work in hybrid multi cloud environments.Then make the worker join the cluster
-sudo apt install curl -y && curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-external-ip <masterFloatingIP>" sh -
+sudo apt install curl -y && curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-external-ip <masterFloatingIP> --flannel-external-ip" sh -
 after this , check if the master node of the cluster is up and running using:
 sudo kubectl get nodes
 check also the metric server status using:
