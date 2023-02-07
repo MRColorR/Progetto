@@ -5,7 +5,7 @@
 |	|						Hyper-V vNet 172.26.80.0/20 (default network adapter)				                |	    |
 |	|						Hyper-V Gateway 172.26.80.1								                            |	    |
 |	|																		                                    |      	|
-|	|	|--------------"devstack1"UbuntuVM--------------|--------------"devstack1"UbuntuVM--------------|	    |	    |	
+|	|	|--------------"devstack1"UbuntuVM--------------|--------------"devstack2"UbuntuVM--------------|	    |	    |	
 |	|	|		Eth0 IP Addr: 172.26.81.100		        |		Eth0 IP Addr: 172.26.86.130		        |	    |	    |
 |	|	|		[local.conf config]			            |		[local.conf config]			            |	    |	    |
 |	|	|		FLAT_INTERFACE=eth0			            |		FLAT_INTERFACE=eth0			            |	    |	    |
