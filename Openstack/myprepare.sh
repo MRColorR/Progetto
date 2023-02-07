@@ -57,27 +57,27 @@ do
     openstack security group rule create kubesg --proto $proto --dst-port $ports --description "$description"
     echo openstack security group rule create kubesg --proto $proto --dst-port $ports --description "$description"
 done << EOF
-TCP     22      SSH
-TCP     80      HTTP for testing
-TCP     443     HTTPS for testing
-TCP     9993    Zerotier-manage
-UDP     9993    Zerotier-connect
-TCP     30080   wwwProj
-TCP     30500   apiProj
-TCP     6443    Kubernetes API Server
-TCP     2379:2380       etcd server client API
-TCP     10250   Kubelet API
-TCP     10251   kube-scheduler
-TCP     10252   kube-controller-manager
-TCP     10255   Read-only Kubelet API
-TCP     30000:32767     NodePort Services
-TCP     179     Calico BGP network
-TCP     9099    Calico felix (health check)
-UDP     8285    Flannel
-UDP     8472    Flannel
-UDP     51820   Wireguard
-TCP     6781:6784       Weave Net
-UDP     6783:6784       Weave Net
+TCP     22      "SSH"
+TCP     80      "HTTP-for-testing"
+TCP     443     "HTTPS-for-testing"
+TCP     9993    "Zerotier-manage"
+UDP     9993    "Zerotier-connect"
+TCP     30080   "wwwProj"
+TCP     30500   "apiProj"
+TCP     6443    "Kubernetes-API-Server"
+TCP     2379:2380       "etcd-server-client-API"
+TCP     10250   "Kubelet-API"
+TCP     10251   "kube-scheduler"
+TCP     10252   "kube-controller-manager"
+TCP     10255   "Read-only-Kubelet-API"
+TCP     30000:32767     "NodePort-Services"
+TCP     179     "Calico-BGP-network"
+TCP     9099    "Calico-felix-(health-check)"
+UDP     8285    "Flannel"
+UDP     8472    "Flannel"
+UDP     51820   "Wireguard"
+TCP     6781:6784       "Weave-Net"
+UDP     6783:6784       "Weave-Net"
 EOF
 
 # Create an SSH keypair.

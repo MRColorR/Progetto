@@ -12,12 +12,17 @@ Run the command "sudo resize2fs /dev/sda1" to resize the ext4 filesystem to the 
 I update everything in the vm:
 sudo apt update && sudo apt full-upgrade -y
 
+setup static ip for the VMs, check if a desired static ip is free and in case set it as Eth1 IP address:
+arp -n <IPAddressToCheck> if no response is received then the ip should be free
+use nmtui to edit eth1
+
 (optional) I install curl and zerotier and join on a VXLAN :
 sudo apt install curl -y && curl -s https://install.zerotier.com | sudo bash
 sudo zerotier-cli join <VXLANID>
 
 I add the two machines to each other's hosts file
-sudo nano /etc/hosts and add the machine itself and its counterpart
+sudo nano /etc/hosts and add the machine itself and its counterpart calling them devstack1 and devstack2
+
 
 I install devstack (partially following https://docs.openstack.org/devstack/latest/):
 sudo useradd -s /bin/bash -d /opt/stack -m stack
@@ -31,9 +36,9 @@ cp ./samples/local.conf . && nano local.conf
 setupt the required informations and to make sure the instances are reachable using their floating ip from all the machine in my LAN i set up the IP and floating ranges accordingly:
 
 my config for openstack1 in local.conf
-FLAT_INTERFACE=eth0
-HOST_IP=172.26.81.100
-FLOATING_RANGE="172.26.81.160/27"
+FLAT_INTERFACE=eth1
+HOST_IP=192.168.1.111
+FLOATING_RANGE="192.168.1.112/28"
 
 ADMIN_PASSWORD=<password>
 DATABASE_PASSWORD=$ADMIN_PASSWORD
@@ -42,9 +47,9 @@ SERVICE_PASSWORD=$ADMIN_PASSWORD
 
 
 my config for openstack2 in local.conf
-FLAT_INTERFACE=eth0
-HOST_IP=172.26.86.130
-FLOATING_RANGE="172.26.86.160/27"
+FLAT_INTERFACE=eth1
+HOST_IP=192.168.2.222
+FLOATING_RANGE="192.168.2.224/28"
 
 ADMIN_PASSWORD=<password>
 DATABASE_PASSWORD=$ADMIN_PASSWORD
