@@ -106,11 +106,9 @@ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 after the instances inside openstack2, we're ready to make them join the cluster as workers
 now use the same <masterFloatingIP> used earlier to check if the instance inside (e.g. named worker1b) openstack2 can get the certificate from the instance (e.g. master1a) inside openstack1 , it can good
+ 
 
-now make it join the k3s cluster
-sudo apt install curl -y && sudo curl -sfL https://get.k3s.io | K3S_URL="https://<masterFloatingIP>:6443" K3S_TOKEN="<token>" sh -  
-
-it got stuck...why? how to fix?
+to check packets use wireshark with filter ip.addr == 172.26.86.169 or ip.addr == 172.16.2.245 or ip.addr == 172.16.2.95 or ip.addr == 172.26.86.164 or ip.addr == 172.26.81.174 or ip.addr == 172.16.1.254 or ip.addr == 172.26.81.189 or ip.addr == 172.16.1.63
 
 
 
