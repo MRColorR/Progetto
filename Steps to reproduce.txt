@@ -61,7 +61,7 @@ start the installation process using: ./stack.sh && cd ..
 Once started I load the image for the vm on which we will then run k8s, I have a script to speed everything up called myprepare.sh take the other info from there intermediate steps. at the end you should have 2 vm with Debian (genericCloud) that can talk to internet.
 
 From the root of the stack folder (out of devstack folder) use:
-git clone https://github.com/MRColorR/onehundredten && cp ./onehundredten/Openstack/myprepare.sh . && sudo chmod +x myprepare.sh && ./myprepare.sh
+git clone https://github.com/MRColorR/onehundredten && cp ./onehundredten/openstack/myprepare.sh . && sudo chmod +x myprepare.sh && ./myprepare.sh
 
 now the two vms will be up, able to go out on the internet and you can connect to ssh
 
