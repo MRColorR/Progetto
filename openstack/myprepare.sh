@@ -116,7 +116,6 @@ read -r -p "The default selected interface is $NIC, do you want to use a differe
 read -r -p "Do you want to enable ip_forward, proxy_arp and NAT postrouting on $NIC functions? Y/N? "$'\n' yn
         case $yn in
             [Yy]* )
-                sudo bash
                 sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
                 sudo sh -c "echo 1 > /proc/sys/net/ipv4/conf/$NIC/proxy_arp"
                 sudo iptables -t nat -A POSTROUTING -o $NIC -j MASQUERADE;;
