@@ -101,3 +101,27 @@ openstack server add security group $NAME1 kubesg
 openstack server add security group $NAME2 kubesg
 openstack server add floating ip $NAME1 $IP1
 openstack server add floating ip $NAME2 $IP2
+
+NIC='eth0'
+read -r -p "The default selected interface is $NIC, do you want to use a different interface? Y/N? "$'\n' yn
+        case $yn in
+            [Yy]* )
+                read -r -p "OK, insert the name of the interface you want to use"$'\n' NIC
+                printf "New interface selected is $NIC";;
+            [Nn]* ) 
+                printf "Ok, the default $NIC will be used";;
+            * ) printf "Please answer yes or no.";;
+        esac 
+
+read -r -p "Do you want to enable ip_forward, proxy_arp and NAT postrouting on $NIC functions? Y/N? "$'\n' yn
+        case $yn in
+            [Yy]* )
+                sudo bash
+                echo 1 > /proc/sys/net/ipv4/ip_forward
+                echo 1 > /proc/sys/net/ipv4/conf/eth0/proxy_arp
+                iptables -t nat -A POSTROUTING -o $NIC -j MASQUERADE;;
+            [Nn]* ) 
+                printf "Ok, no nodifications to the VM network config";;
+            * ) printf "Please answer yes or no.";;
+        esac 
+

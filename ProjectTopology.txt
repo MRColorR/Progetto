@@ -5,7 +5,7 @@
 |	|						Hyper-V vNet 172.23.224.0/20 (default network adapter)				                |	    |
 |	|						Hyper-V Gateway 172.23.224.1							                            |	    |
 |   |                       External Net  192.168.0.0/22                                                        |       |
-|   |                       External Gateway 192.168.0.1                                                        |       |
+|   |                       External Gateway 192.168.1.1                                                        |       |
 |   |                                                                                                           |       |
 |	|																		                                    |      	|
 |	|	|--------------"devstack1"UbuntuVM--------------|--------------"devstack2"UbuntuVM--------------|	    |	    |	

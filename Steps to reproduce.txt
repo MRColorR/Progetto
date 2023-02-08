@@ -69,7 +69,7 @@ as on the ubuntu machine the ip_forward is already enabled (as you can see using
 sudo bash
 echo 1 > /proc/sys/net/ipv4/ip_forward
 echo 1 > /proc/sys/net/ipv4/conf/eth0/proxy_arp
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 
+iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE 
 
 to show them and find the floating ips assigned to each vm use issue the following command:
 source ./devstack/openrc admin admin
