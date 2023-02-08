@@ -1,5 +1,5 @@
 #!/bin/bash
-#sudo apt install git -y && git clone https://opendev.org/openstack/devstack
+sudo apt install git -y && git clone https://opendev.org/openstack/devstack
 cp $PWD/onehundredten/openstack/mylocal.conf $PWD/devstack/local.conf
 
 read -r -p "Insert the password you want to assign to the openstack admin"$'\n' PASSWD ;
