@@ -19,4 +19,3 @@ else
   echo "Error occurred during setup" >&2
   exit 1
 fi
-EOF
