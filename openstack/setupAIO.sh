@@ -11,7 +11,8 @@ sed -i "s^HOST_IP=192.168.1.111^HOST_IP=$IFACE_IP^" $PWD/devstack/local.conf
 FLOAT_RANGE="192.168.1.112/28"
 read -r -p "Insert the floating ip range to use on the interface $IFACE_NAME that has ip $IFACE_IP , a /27 or /28 will suffice e.g. insert 192.168.1.112/28"$'\n' FLOAT_RANGE;
 sed -i "s^192.168.1.112/28^$FLOAT_RANGE^" $PWD/devstack/local.conf
-cd $PWD/devstack && ./stack && cd ..
+cd /opt/stack/devstack/ 
+./stack && cd ..
 cp $PWD/onehundredten/openstack/myprepare.sh . && sudo chmod +x myprepare.sh && ./myprepare.sh
 
 if [ $? -eq 0 ]; then
