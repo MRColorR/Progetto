@@ -1,1 +1,1 @@
-sudo apt install git -y && git clone https://github.com/MRColorR/onehundredten && sudo chmod +x $PWD/onehundredten/openstack/setupAIO.sh && ./onehundredten/openstack/setupAIO.sh
+sudo apt install git -y && git clone https://github.com/MRColorR/onehundredten && sudo chmod +x $PWD/onehundredten/openstack/setupAIO.sh && ./onehundredten/openstack/setupStackUser.sh
