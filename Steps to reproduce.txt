@@ -33,7 +33,7 @@ sudo apt install git -y && git clone https://opendev.org/openstack/devstack && c
 copy the configuration file from the examples and edit it:
 cp ./samples/local.conf . && nano local.conf
 
-setupt the required informations and to make sure the instances are reachable using their floating ip from all the machine in my LAN i set up the IP and floating ranges accordingly:
+setup the required informations and to make sure the instances are reachable using their floating ip from all the machine in my LAN i set up the IP and floating ranges accordingly:
 
 my config for openstack1 in local.conf
 FLAT_INTERFACE=eth1
@@ -68,7 +68,7 @@ now the two vms will be up, able to go out on the internet and you can connect t
 as on the ubuntu machine the ip_forward is already enabled (as you can see using: less /proc/sys/net/ipv4/ip_forward) but the proxy_arp is not we need to enable this to make the instances reachable from the other machines in the same lan:
 sudo bash
 echo 1 > /proc/sys/net/ipv4/ip_forward
-echo 1 > /proc/sys/net/ipv4/conf/eth0/proxy_arp
+echo 1 > /proc/sys/net/ipv4/conf/eth1/proxy_arp
 iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE 
 
 to show them and find the floating ips assigned to each vm use issue the following command:
@@ -106,8 +106,8 @@ you can use the same myprepare.sh file to speed up the instances deployment also
 notice: as on the ubuntu machine the ip_forward is already enabled (as you can see using: less /proc/sys/net/ipv4/ip_forward) but the proxy_arp is not we need to enable this to make the instances reachable from the other machines in the same lan:
 sudo bash
 echo 1 > /proc/sys/net/ipv4/ip_forward
-echo 1 > /proc/sys/net/ipv4/conf/eth0/proxy_arp
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 
+echo 1 > /proc/sys/net/ipv4/conf/eth1/proxy_arp
+iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE 
 
 after the instances inside openstack2, we're ready to make them join the cluster as workers
 now use the same <masterFloatingIP> used earlier to check if the instance inside (e.g. named worker1b) openstack2 can get the certificate from the instance (e.g. master1a) inside openstack1 , it can good
