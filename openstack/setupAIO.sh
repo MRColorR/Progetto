@@ -1,9 +1,4 @@
 #!/bin/bash
-sudo apt update && sudo apt full-upgrade -y
-sudo useradd -s /bin/bash -d /opt/stack -m stack
-sudo chmod +x /opt/stack
-echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack
-sudo -u stack -i <<EOF
 sudo apt install git -y && git clone https://opendev.org/openstack/devstack && git clone https://github.com/MRColorR/onehundredten
 cp $PWD/onehundredten/openstack/mylocal.conf $PWD/devstack/local.conf
 
