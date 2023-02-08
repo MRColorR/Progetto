@@ -1,11 +1,13 @@
 #!/bin/bash
 sudo apt install git -y
-while true; do
 git clone https://opendev.org/openstack/devstack
-if [ $? -eq 0 ]; then
-break
+if [ $? -ne 0 ]; then
+  git clone https://github.com/openstack/devstack
+  if [ $? -ne 0 ]; then
+    echo "Error occurred during git clone" >&2
+    exit 1
+  fi
 fi
-done
 cp $PWD/onehundredten/openstack/mylocal.conf $PWD/devstack/local.conf
 
 read -r -p "Insert the password you want to assign to the openstack admin"$'\n' PASSWD ;
@@ -20,9 +22,9 @@ sed -i "s^192.168.1.112/28^$FLOAT_RANGE^" $PWD/devstack/local.conf
 
 while true; do
 $PWD/devstack/stack.sh
-if [ $? -eq 0 ]; then
-break
-fi
+  if [ $? -eq 0 ]; then
+    break
+  fi
 $PWD/devstack/unstack.sh
 $PWD/devstack/clean.sh
 done
