@@ -113,7 +113,7 @@ after the instances inside openstack2, we're ready to make them join the cluster
 now use the same <masterFloatingIP> used earlier to check if the instance inside (e.g. named worker1b) openstack2 can get the certificate from the instance (e.g. master1a) inside openstack1 , it can good
  
 
-to check packets use wireshark with filter ip.addr == 172.26.86.169 or ip.addr == 172.16.2.245 or ip.addr == 172.16.2.95 or ip.addr == 172.26.86.164 or ip.addr == 172.26.81.174 or ip.addr == 172.16.1.254 or ip.addr == 172.26.81.189 or ip.addr == 172.16.1.63
+to check packets use wireshark with filter ip.addr == 192.168.1.126 or ip.addr == 172.16.1.137 or ip.addr == 192.168.1.125 or ip.addr == 172.16.1.239 or ip.addr == 192.168.2.226 or ip.addr == 172.16.2.122 or ip.addr == 192.168.2.231 or ip.addr == 172.16.2.218
 
 
 
