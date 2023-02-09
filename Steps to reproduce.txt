@@ -94,20 +94,15 @@ sudo cat /var/lib/rancher/k3s/server/node-token
 to chek if the candidate node can get the certificate on the master using the 6443 port use: curl -vk https://<masterFloatingIP>/cacerts
 
 now ssh again in the worker node on the same openstack and install the k3s agent passing the master's ip and the token
-sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=https://<masterFloatingIP>:6443 K3S_TOKEN="token" INSTALL_K3S_EXEC="--node-external-ip <workerFloatingIP>" sh -
+sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=https://192.168.1.126:6443 K3S_TOKEN="K10bf8d65c416f3f7488d36dbb93d9482b58be71eac2ffb6def35fa27fe14e38a99::server:adfbed6c319611f802a16f68106597e4" INSTALL_K3S_EXEC="--node-external-ip 192.168.2.226" sh -
 (also you ca do it after installing the entire k3s using sudo k3s agent -t <token> --server https://<masterFloatingIP>:6443 --node-external-ip <workerFloatingIP>
 )
 
-Add labels to each node on-prem:
+Add labels to each node:
 sudo kubectl label nodes master1a worker1a node-type=on-prem
+sudo kubectl label nodes worker2b worker2b1 node-type=burst
 
 Now repeats the speps to create a second openstack cloud that will simulate another cloud used during an overload to cloud burst the cluster replicas.
-you can use the same myprepare.sh file to speed up the instances deployment also in openstack2 (secondo openstack VM)
-notice: as on the ubuntu machine the ip_forward is already enabled (as you can see using: less /proc/sys/net/ipv4/ip_forward) but the proxy_arp is not we need to enable this to make the instances reachable from the other machines in the same lan:
-sudo bash
-echo 1 > /proc/sys/net/ipv4/ip_forward
-echo 1 > /proc/sys/net/ipv4/conf/eth1/proxy_arp
-iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE 
 
 after the instances inside openstack2, we're ready to make them join the cluster as workers
 now use the same <masterFloatingIP> used earlier to check if the instance inside (e.g. named worker1b) openstack2 can get the certificate from the instance (e.g. master1a) inside openstack1 , it can good
