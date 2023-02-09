@@ -117,8 +117,7 @@ read -r -p "Do you want to enable ip_forward, proxy_arp and NAT postrouting on $
         case $yn in
             [Yy]* )
                 sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
-                sudo sh -c "echo 1 > /proc/sys/net/ipv4/conf/$NIC/proxy_arp"
-                sudo iptables -t nat -A POSTROUTING -o $NIC -j MASQUERADE;;
+                sudo sh -c "echo 1 > /proc/sys/net/ipv4/conf/$NIC/proxy_arp";;
             [Nn]* ) 
                 printf "Ok, no nodifications to the VM network config";;
             * ) printf "Please answer yes or no.";;
