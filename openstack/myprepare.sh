@@ -107,9 +107,9 @@ read -r -p "The default selected interface is $NIC, do you want to use a differe
         case $yn in
             [Yy]* )
                 read -r -p "OK, insert the name of the interface you want to use"$'\n' NIC
-                printf "New interface selected is $NIC";;
+                printf "New interface selected is $NIC"$'\n';;
             [Nn]* ) 
-                printf "Ok, the default $NIC will be used";;
+                printf "Ok, the default $NIC will be used"$'\n';;
             * ) printf "Please answer yes or no.";;
         esac 
 
