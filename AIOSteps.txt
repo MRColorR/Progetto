@@ -1,3 +1,6 @@
 curl https://raw.githubusercontent.com/MRColorR/onehundredten/master/openstack/setupStackUser.sh > setupStackUser.sh && sudo chmod +x setupStackUser.sh && ./setupStackUser.sh
 sudo -u stack -i
 sudo apt install git -y && git clone https://github.com/MRColorR/onehundredten && sudo chmod +x $PWD/onehundredten/openstack/setupAIO.sh && ./onehundredten/openstack/setupAIO.sh
+install k3s nodes
+deploy the blueprint
+curl https://raw.githubusercontent.com/MRColorR/onehundredten/master/k8s-www-api-blueprint.yaml > k8s-www-api-blueprint.yaml && sudo kubectl apply -f k8s-www-api-blueprint.yaml
