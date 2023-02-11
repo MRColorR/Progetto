@@ -1,6 +1,8 @@
 # onehundredten
 
-In this project we produce a working PoC of a vendor-agnostic multi-cloud bursting solution using two openstack clouds (devstack) and a multi cloud kubernetes cluster (K3s). The example services we run are a simple website and an API used to compute the factorial of the number entered on the website by the user. The computation is executed by the cluster and both services have their horizontal auto scaler and thanks to the labels defined on the nodes the services will be executed on the first cloud (on-prem) until no more resources are available. Then the autoscaler proceeds to burst the workload also on the second cloud (public/secondary cloud) realizing the cloud bursting function. Additionnaly in the blueprint we defined several policies for supporting auto backups/rollback of the services and rolling updates.
+In this project we produce a working PoC of a vendor-agnostic multi-cloud bursting solution using two openstack clouds (devstack) and a multi cloud kubernetes cluster (K3s). 
+
+The example services we run are a simple website and an API used to compute the factorial of the number entered on the website by the user. The computation is executed by the cluster and both services have their horizontal auto scaler and thanks to the labels defined on the nodes the services will be executed on the first cloud (on-prem) until no more resources are available. Then the autoscaler proceeds to burst the workload also on the second cloud (public/secondary cloud) realizing the cloud bursting function. Additionnaly in the blueprint we defined several policies for supporting auto backups/rollback of the services and rolling updates.
 
 ---
 
@@ -40,7 +42,7 @@ In this project we produce a working PoC of a vendor-agnostic multi-cloud bursti
       - Now SSH into the workers node and make them join the cluster running the following command: 
         
         ```sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=<masterFloatingIP>:6443 K3S_TOKEN="token" INSTALL_K3S_EXEC="--node-external-ip <workerFloatingIP>" sh -```
-    - You can check on the master node if all is up, connected and running using: ```sudo kubectl get nodes``` and ```sudo kubectl top nodes```
+    - You can check on the master node if all is connected and running using: ```sudo kubectl get nodes``` and ```sudo kubectl top nodes```
     - To complete the project deploy the website and the factorial API using:
         
       ``` kubectl apply -f '.\k8s-www-api-blueprint.yaml' ``` 
