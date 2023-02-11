@@ -43,6 +43,9 @@ The example services we run are a simple website and an API used to compute the 
         
         ```sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=<masterFloatingIP>:6443 K3S_TOKEN="token" INSTALL_K3S_EXEC="--node-external-ip <workerFloatingIP>" sh -```
     - You can check on the master node if all is connected and running using: ```sudo kubectl get nodes``` and ```sudo kubectl top nodes```
+    - Add labels to each node runing:
+      
+      ```sudo kubectl label nodes master1a worker1a node-type=on-prem ``` and ```sudo kubectl label nodes worker2b worker2b1 node-type=burst ```
     - To complete the project deploy the website and the factorial API using:
         
       ``` kubectl apply -f '.\k8s-www-api-blueprint.yaml' ``` 
