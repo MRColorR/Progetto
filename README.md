@@ -67,6 +67,7 @@ You can get metrics about the deployment using the K8s_stats.py script in the K8
     ```.\<apache-jmeter-x.yFolder>\bin\jmeter.bat -f -n -t '.\HTTP Request www and api 2.jmx' -l .\Report_HTML\results.csv -e -o .\Report_HTML\```
 
 ### Boxplot and images genetation
-  - Just run the draw_metrics.py to generate an SVG file containing the graphical rappresentation of the metrics recorded by the k8s_stats.py . 
+  - Just run the draw_metrics.py to generate an SVG file containing the graphical rappresentation of the metrics recorded by the k8s_stats.py:
+   
     ```python .\draw_metrics.py``` 
     (check the code for optional flags you can use to customize its behaviour)
