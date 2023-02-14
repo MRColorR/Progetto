@@ -2,7 +2,7 @@
 /CPM/*
 /JmeterLoadTest/apache-jmeter-5.5
 /JmeterLoadTest/temp
-/JmeterLoadTest/Report_HTML/*
+/JmeterLoadTest/Report_HTML*/
 /JmeterLoadTest/jmeter.log
 /JmeterLoadTest/*.txt
 /K8s-metrics/*.yaml
