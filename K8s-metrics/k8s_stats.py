@@ -47,33 +47,38 @@ def get_metrics(namespace, deployment_name):
         print(e)
         return None, None
 
-def get_hpa_params(namespace, deployment_name):
+def get_hpa_cpu_threshold(namespace, deployment_name):
     """
-    Retrieve the HPA CPU averageUtilization threshold and scaleDown stabilizeWindowSeconds for a deployment.
+    Retrieve the CPU utilization threshold for an HPA.
     
     Parameters:
         namespace (str): The namespace of the deployment.
         deployment_name (str): The name of the deployment.
     
     Returns:
-        tuple: A tuple containing the CPU averageUtilization threshold and the scaleDown stabilizeWindowSeconds.
+        float: The CPU utilization threshold.
     """
-    # Create an instance of the AutoscalingV1Api
-    api = client.AutoscalingV1Api()
+    # Create an instance of the AutoscalingV2Api
+    api = client.AutoscalingV2Api()
     
     try:
-        # Get the HPA for the specified deployment
-        hpa = api.read_namespaced_horizontal_pod_autoscaler(name=deployment_name, namespace=namespace)
+        # Get the HorizontalPodAutoscaler for the deployment
+        hpa = api.read_namespaced_horizontal_pod_autoscaler(
+            name=deployment_name, namespace=namespace
+        )
+        #print("hpa:", hpa)  # Debugging line
+        # Get the CPU utilization threshold from the HPA
+        if hpa.spec.metrics and hpa.spec.metrics[0].type == "Resource":
+            hpa_cpu_threshold = hpa.spec.metrics[0].resource.target.average_utilization
+        else:
+            hpa_cpu_threshold = None
         
-        # Retrieve the CPU averageUtilization threshold and scaleDown stabilizeWindowSeconds
-        cpu_threshold = hpa.spec.metrics[0].resource.target.average_utilization
-        scale_down_window = hpa.spec.scale_down_stabilization_window_seconds
+        #print("hpa_cpu_threshold:", hpa_cpu_threshold)  # Debugging line
         
-        # Return the CPU averageUtilization threshold and scaleDown stabilizeWindowSeconds
-        return cpu_threshold, scale_down_window
+        return hpa_cpu_threshold
     except Exception as e:
         print(e)
-        return None, None
+        return None
 
 
 def main():
@@ -102,7 +107,7 @@ def main():
     config.load_kube_config(config_file=kubeconfig)
 
     # Define the headers for the output file
-    headers = ["timestamp", "cpu_usage_avg", "memory_usage_avg"]
+    headers = ["timestamp", "cpu_usage_avg", "memory_usage_avg", "hpa_cpu_threshold"]
     # Determine the mode in which to open the file (append or write)
     mode = "a" if args.append else "w"
     with open(filename, mode) as f:
@@ -116,14 +121,19 @@ def main():
         # Loop for the number of iterations, retrieving metrics and writing them to the file
         for i in range(iterations):
             cpu_usage, memory_usage = get_metrics(namespace, deployment_name)
-            if cpu_usage is None or memory_usage is None:
+            hpa_cpu_threshold = get_hpa_cpu_threshold(namespace, deployment_name)
+            # Check if CPU usage, memory usage, or HPA CPU threshold is None
+            if cpu_usage is None or memory_usage is None or hpa_cpu_threshold is None:
                 print("Failed to retrieve metrics, retrying in {} seconds".format(sleep_time))
             else:
+                # Create a dictionary with the metrics
                 row = {
                     "timestamp": time.time(),
                     "cpu_usage_avg": cpu_usage,
-                    "memory_usage_avg": memory_usage
+                    "memory_usage_avg": memory_usage,
+                    "hpa_cpu_threshold": hpa_cpu_threshold
                 }
+                # Write the metrics to the file
                 writer.writerow(row)
                 print("Wrote metrics to file: {}".format(row))
             time.sleep(sleep_time)

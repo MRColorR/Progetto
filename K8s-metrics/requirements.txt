@@ -1,1 +1,4 @@
 kubernetes
+pandas
+matplotlib
+numpy

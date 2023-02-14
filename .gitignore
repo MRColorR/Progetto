@@ -6,5 +6,6 @@
 /JmeterLoadTest/jmeter.log
 /JmeterLoadTest/*.txt
 /K8s-metrics/*.yaml
+/K8s-metrics/*.svg
 /K8s-metrics/myenv/
 /K8s-metrics/*.csv

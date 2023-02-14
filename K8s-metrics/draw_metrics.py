@@ -27,17 +27,40 @@ def main():
         filtered_data.boxplot(column="cpu_usage_avg", ax=ax[0])
         filtered_data.boxplot(column="memory_usage_avg", ax=ax[1])
         
-        # Add the hpa_cpu_threshold to the x axis of the boxplots
-        ax[0].axhline(y=hpa_cpu_threshold, color='r', linestyle='--')
-        ax[1].axhline(y=hpa_cpu_threshold, color='r', linestyle='--')
-        
         # Set the titles of the boxplots
         ax[0].set_title("CPU Usage")
         ax[1].set_title("Memory Usage")
+
+        # Add labels to the y-axis of the boxplots
+        ax[0].set_ylabel("CPU Usage (average in mCores)")
+        ax[1].set_ylabel("Memory Usage (average in MB)")
+        
+        # Calculate the median, mean, max, and min values
+        cpu_median = filtered_data["cpu_usage_avg"].median()
+        cpu_mean = filtered_data["cpu_usage_avg"].mean()
+        cpu_max = filtered_data["cpu_usage_avg"].max()
+        cpu_min = filtered_data["cpu_usage_avg"].min()
+        mem_median = filtered_data["memory_usage_avg"].median()
+        mem_mean = filtered_data["memory_usage_avg"].mean()
+        mem_max = filtered_data["memory_usage_avg"].max()
+        mem_min = filtered_data["memory_usage_avg"].min()
+        
+        # Display the median, mean, max, and min values for the CPU usage
+        ax[0].text(x=1.1, y=cpu_median, s="Median: {:.2f}".format(cpu_median), color='blue')
+        ax[0].text(x=1.1, y=cpu_mean, s="Mean: {:.2f}".format(cpu_mean), color='orange')
+        ax[0].text(x=1.1, y=cpu_max, s="Max: {:.2f}".format(cpu_max), color='red')
+        ax[0].text(x=1.1, y=cpu_min, s="Min: {:.2f}".format(cpu_min), color='green')
+
+        # Display the median, mean, max, and min values for the memory usage
+        ax[1].text(x=1.1, y=mem_median, s="Median: {:.2f}".format(mem_median), color='blue')
+        ax[1].text(x=1.1, y=mem_mean, s="Mean: {:.2f}".format(mem_mean), color='orange')
+        ax[1].text(x=1.1, y=mem_max, s="Max: {:.2f}".format(mem_max), color='red')
+        ax[1].text(x=1.1, y=mem_min, s="Min: {:.2f}".format(mem_min), color='green')
         
         # Save the figure as a SVG file
         postfix = "_threshold_{}".format(int(hpa_cpu_threshold))
         plt.savefig("deployment_metrics{}.svg".format(postfix))
+
 
 if __name__ == "__main__":
     main()
