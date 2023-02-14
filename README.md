@@ -48,7 +48,7 @@ The example services we run are a simple website and an API used to compute the 
       ```sudo kubectl label nodes master1a worker1a node-type=on-prem ``` and ```sudo kubectl label nodes worker2b worker2b1 node-type=burst ```
     - To complete the project deploy the website and the factorial API using:
         
-      ``` kubectl apply -f '.\k8s-www-api-blueprint.yaml' ``` 
+      ``` curl https://raw.githubusercontent.com/MRColorR/onehundredten/master/k8s-www-api-blueprint.yaml > k8s-www-api-blueprint.yaml && sudo kubectl apply -f k8s-www-api-blueprint.yaml ``` 
     - You should be able to reach the website from each node on port :30080 and ask for the factorial of a number you can also contatc directly the APi on port 30500
 
 ---
@@ -68,6 +68,6 @@ You can get metrics about the deployment using the K8s_stats.py script in the K8
 
 ### Boxplot and images genetation
   - Just run the draw_metrics.py to generate an SVG file containing the graphical rappresentation of the metrics recorded by the k8s_stats.py:
-   
+
     ```python .\draw_metrics.py``` 
     (check the code for optional flags you can use to customize its behaviour)
