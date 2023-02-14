@@ -149,7 +149,7 @@ spec:
           averageUtilization: 50
   behavior:
     scaleDown:
-      stabilizationWindowSeconds: 180
+      stabilizationWindowSeconds: 60
 
 ---
 apiVersion: autoscaling/v2
@@ -172,4 +172,4 @@ spec:
           averageUtilization: 50
   behavior:
     scaleDown:
-      stabilizationWindowSeconds: 180
+      stabilizationWindowSeconds: 60
