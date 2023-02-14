@@ -57,7 +57,9 @@ You can get metrics about the deployment using the K8s_stats.py script in the K8
 
 ### K8s Python Client
   - Start the metrics recording using 
-    ```python k8s_stats.py --deployment_name=factorial-api --observation_time=180 --append```(check the code for optional flags you can use to customize its behaviour)
+
+    ```python k8s_stats.py --deployment_name=factorial-api --observation_time=180 --append``` 
+    (check the code for optional flags you can use to customize its behaviour)
   - While the K8s Python Client is running , start the load test using Jmeter
 ### JMeter load testing
   - Jmeter here is used for load tests, see the jmeter file. After downloading jmeter latest release you can run it using: 
@@ -66,4 +68,5 @@ You can get metrics about the deployment using the K8s_stats.py script in the K8
 
 ### Boxplot and images genetation
   - Just run the draw_metrics.py to generate an SVG file containing the graphical rappresentation of the metrics recorded by the k8s_stats.py . 
-    `````python .\draw_metrics.py` (check the code for optional flags you can use to customize its behaviour)
+    ```python .\draw_metrics.py``` 
+    (check the code for optional flags you can use to customize its behaviour)
