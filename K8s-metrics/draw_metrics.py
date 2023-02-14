@@ -60,7 +60,7 @@ def main():
     # Set the x-axis labels
     ax[0].set_xticklabels(unique_thresholds)
     ax[0].set_xticks(range(len(unique_thresholds)))
-    ax[0].set_xticklabels(["hpa_cpu_treshold: {}".format(int(x)) for x in unique_thresholds])
+    ax[0].set_xticklabels(["hpa_tresh: {}".format(int(x)) for x in unique_thresholds])
 
     # Draw the boxplots of the memory usage
     mem_thresholds = []
@@ -90,7 +90,7 @@ def main():
     # Set the x-axis labels
     ax[1].set_xticklabels(unique_thresholds)
     ax[1].set_xticks(range(len(unique_thresholds)))
-    ax[1].set_xticklabels(["hpa_cpu_treshold: {}".format(int(x)) for x in unique_thresholds])
+    ax[1].set_xticklabels(["hpa_tresh: {}".format(int(x)) for x in unique_thresholds])
     # Set the titles of the boxplots
     ax[0].set_title("CPU Usage")
     ax[1].set_title("Memory Usage")
