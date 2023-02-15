@@ -116,7 +116,7 @@ spec:
           resources:
             requests:
               cpu: 128m
-              memory: 256Mi
+              memory: 128Mi
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -162,7 +162,7 @@ spec:
     kind: Deployment
     name: factorial-api
   minReplicas: 2
-  maxReplicas: 25
+  maxReplicas: 35
   metrics:
     - type: Resource
       resource:
