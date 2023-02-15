@@ -41,7 +41,17 @@ def get_latency_data(hpa_cpu_threshold):
     data = pd.read_csv(filename)
     
     # Filter the data to include only the "HTTP Request API" rows
-    filtered_data = data[data["label"] == "HTTP Request API"]
+    filtered_data = data[(data["label"] == "HTTP Request API") & (data["responseCode"] == "200")]
+
+    # Calculate the IQR of the latency data
+    q1 = filtered_data["Latency"].quantile(0.25)
+    q3 = filtered_data["Latency"].quantile(0.75)
+    iqr = q3 - q1
+    
+    # Remove any data points that fall outside of the lower and upper bounds
+    lower_bound = q1 - 1.5*iqr
+    upper_bound = q3 + 1.5*iqr
+    filtered_data = filtered_data[(filtered_data["Latency"] >= lower_bound) & (filtered_data["Latency"] <= upper_bound)]
     
     # Return the latency data
     return filtered_data
@@ -73,6 +83,15 @@ def main():
         # Filter the data for the current hpa_cpu_threshold
         filtered_data = data[data["hpa_cpu_threshold"] == hpa_cpu_threshold]
 
+        # Calculate the interquartile range (IQR) and remove any data points that fall outside of the lower and upper bounds, defined as Q1 - 1.5IQR and Q3 + 1.5IQR, respectively
+        cpu_q75 = filtered_data["cpu_usage_avg"].quantile(0.75)
+        cpu_q25 = filtered_data["cpu_usage_avg"].quantile(0.25)
+        cpu_iqr = cpu_q75 - cpu_q25
+        cpu_min = cpu_q25 - 1.5 * cpu_iqr
+        cpu_max = cpu_q75 + 1.5 * cpu_iqr
+        filtered_data = filtered_data[(filtered_data["cpu_usage_avg"] >= cpu_min) & (filtered_data["cpu_usage_avg"] <= cpu_max)]
+
+
         # Draw the boxplot of the CPU usage
         box = filtered_data.boxplot(column="cpu_usage_avg", ax=ax[0], positions=[i], return_type="dict")
         stats = get_stats(filtered_data)
@@ -100,6 +119,15 @@ def main():
     for i, hpa_cpu_threshold in enumerate(unique_thresholds):
         # Filter the data for the current hpa_cpu_threshold
         filtered_data = data[data["hpa_cpu_threshold"] == hpa_cpu_threshold]
+
+        # Calculate the interquartile range (IQR) and remove any data points that fall outside of the lower and upper bounds, defined as Q1 - 1.5IQR and Q3 + 1.5IQR, respectively
+        mem_q75 = filtered_data["memory_usage_avg"].quantile(0.75)
+        mem_q25 = filtered_data["memory_usage_avg"].quantile(0.25)
+        mem_iqr = mem_q75 - mem_q25
+        mem_min = mem_q25 - 1.5 * mem_iqr
+        mem_max = mem_q75 + 1.5 * mem_iqr
+        filtered_data = filtered_data[(filtered_data["memory_usage_avg"] >= mem_min) & (filtered_data["memory_usage_avg"] <= mem_max)]
+
 
         # Draw the boxplot of the memory usage
         box = filtered_data.boxplot(column="memory_usage_avg", ax=ax[1], positions=[i], return_type="dict")
