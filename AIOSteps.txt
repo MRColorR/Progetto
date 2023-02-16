@@ -1,11 +1,15 @@
 Install 2 ubuntu vm in hyper-v,
-Enable nested virtualization: Get-VM | ? State -eq 'Off' | Set-VMProcessor -ExposeVirtualizationExtensions $true
+Enable nested virtualization: Get-VM | ? State -eq 'Off' | Set-VMProcessor -ExposeVirtualizationExtensions $true or use the interactive script checkVMsNestedVirtEnabler.ps1 for more options and details.
 Set the RAM to 10240MB (or 12288MB) both on the fixed and on the max limit of the dynamic RAM
 
 (optional: Create a new External virtual network adapter and add it to both machines, it will be the et1 NIC in the VMs and we'll set it to a static ip using: sudo nmtui . 
 On VM1 set eth1 to manual IP addr: 192.168.1.111/22 , gateway 192.168.1.1, dns-servers 141.250.1.7 , 1.1.1.1 ; 
 On VM2 set eth1 to manual IP addr: 192.168.2.222/22 , gateway 192.168.1.1, dns-servers 141.250.1.7 , 1.1.1.1  )
-chack they can ping each other using this ips and they should be also able to reach internet.
+
+To setup static IP for the VMs, check if a desired static ip is free and in case set it as Eth1 IP address:
+arp -n <IPAddressToCheck> if no response is received then the ip should be free
+use nmtui to edit eth1
+Disable and re-enable the connection to load the changes, then check if they can ping each other using theese IPs and they should be also able to reach internet.
 
 Enlarge the VMs disk to 64GB, then after the first boot complete the expansion:
 sudo fdisk /dev/sda
@@ -17,10 +21,6 @@ Run the command "sudo resize2fs /dev/sda1" to resize the ext4 filesystem to the 
 
 I update everything in the VMs:
 sudo apt update && sudo apt full-upgrade -y
-
-Setup static ip for the VMs, check if a desired static ip is free and in case set it as Eth1 IP address:
-arp -n <IPAddressToCheck> if no response is received then the ip should be free
-use nmtui to edit eth1
 
 (optional) I install curl and zerotier and join on a VXLAN :
 sudo apt install curl -y && curl -s https://install.zerotier.com | sudo bash
