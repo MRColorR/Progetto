@@ -94,7 +94,7 @@ sudo cat /var/lib/rancher/k3s/server/node-token
 to chek if the candidate node can get the certificate on the master using the 6443 port use: curl -vk https://<masterFloatingIP>/cacerts
 
 now ssh again in the worker node on the same openstack and install the k3s agent passing the master's ip and the token
-sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=<masterFloatingIP>:6443 K3S_TOKEN="token" INSTALL_K3S_EXEC="--node-external-ip <workerFloatingIP>" sh -
+sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=https://<masterFloatingIP>:6443 K3S_TOKEN="token" INSTALL_K3S_EXEC="--node-external-ip <workerFloatingIP>" sh -
 (also you ca do it after installing the entire k3s using sudo k3s agent -t <token> --server https://<masterFloatingIP>:6443 --node-external-ip <workerFloatingIP>
 )
 
