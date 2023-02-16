@@ -67,8 +67,8 @@ spec:
             periodSeconds: 5
           resources:
             requests:
-              cpu: 128m
-              memory: 128Mi  
+              cpu: 96m
+              memory: 96Mi  
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -89,7 +89,7 @@ metadata:
   labels:
     app: factorial-api
 spec:
-  replicas: 2
+  replicas: 5
   selector:
     matchLabels:
       app: factorial-api
@@ -115,8 +115,8 @@ spec:
           command: ["flask", "run", "--host=0.0.0.0"]
           resources:
             requests:
-              cpu: 128m
-              memory: 128Mi
+              cpu: 96m
+              memory: 96Mi
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -149,7 +149,7 @@ spec:
           averageUtilization: 50
   behavior:
     scaleDown:
-      stabilizationWindowSeconds: 60
+      stabilizationWindowSeconds: 90
 
 ---
 apiVersion: autoscaling/v2
@@ -161,8 +161,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: factorial-api
-  minReplicas: 2
-  maxReplicas: 35
+  minReplicas: 5
+  maxReplicas: 50
   metrics:
     - type: Resource
       resource:
@@ -172,4 +172,4 @@ spec:
           averageUtilization: 50
   behavior:
     scaleDown:
-      stabilizationWindowSeconds: 60
+      stabilizationWindowSeconds: 90
