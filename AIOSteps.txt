@@ -1,6 +1,65 @@
+Install 2 ubuntu vm in hyper-v,
+Enable nested virtualization: Get-VM | ? State -eq 'Off' | Set-VMProcessor -ExposeVirtualizationExtensions $true
+Set the RAM to 10240MB (or 12288MB) both on the fixed and on the max limit of the dynamic RAM
+I enlarge the VMs disk to 64GB, then after the first boot complete the expansion:
+sudo fdisk /dev/sda
+Use the "p" command to view the current partition layout.
+Use the "d" command to delete the partition you want to resize.
+Use the "n" command to create a new partition with the desired size.
+Use the "w" command to write the changes to the disk.
+Run the command "sudo resize2fs /dev/sda1" to resize the ext4 filesystem to the new partition size.
+
+I update everything in the VMs:
+sudo apt update && sudo apt full-upgrade -y
+
+Setup static ip for the VMs, check if a desired static ip is free and in case set it as Eth1 IP address:
+arp -n <IPAddressToCheck> if no response is received then the ip should be free
+use nmtui to edit eth1
+
+(optional) I install curl and zerotier and join on a VXLAN :
+sudo apt install curl -y && curl -s https://install.zerotier.com | sudo bash
+sudo zerotier-cli join <VXLANID>
+
+I add the two machines to each other's hosts file
+sudo nano /etc/hosts and add the machine itself and its counterpart calling them devstack1 and devstack2
+
+Install devstack (partially following https://docs.openstack.org/devstack/latest/) using the :
 curl https://raw.githubusercontent.com/MRColorR/onehundredten/master/openstack/setupStackUser.sh > setupStackUser.sh && sudo chmod +x setupStackUser.sh && ./setupStackUser.sh
 sudo -u stack -i
 sudo apt install git -y && git clone https://github.com/MRColorR/onehundredten && sudo chmod +x $PWD/onehundredten/openstack/setupAIO.sh && ./onehundredten/openstack/setupAIO.sh
-install k3s nodes
+To show the instances and  to find the floating IPs assigned to each instance use the following commands:
+source ./devstack/openrc admin admin
+openstack server list
+
+Using ping check that openstack1 and its instances can reach openstack2 and its instances (they can). You can ping them from each other and also any website by name (eg. google.com) or ip to check networking
+
+Connect to the instances using SSH then configure the kubernetes cluster and connect the cluster nodes:
+ssh -i kubekey debian@<instanceFloatingIP>
+
+install k3s:
+
+now proceed installing k3s on the master node making it advertise its floating ip so it could work in hybrid multi cloud environments.Then make the worker join the cluster
+sudo apt install curl -y && curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-external-ip <masterFloatingIP> --flannel-external-ip" sh -
+after this , check if the master node of the cluster is up and running using:
+sudo kubectl get nodes
+check also the metric server status using:
+sudo kubectl get deployment,pods -n kube-system | grep metrics-server
+or
+sudo kubectl top nodes
+Now to get from the master node the token that will allow us to add the other worker nodes run:
+sudo cat /var/lib/rancher/k3s/server/node-token
+To chek if the candidate node can get the certificate on the master using the 6443 port use: curl -vk https://<masterFloatingIP>/cacerts
+
+now ssh again in the worker node on the same openstack and install the k3s agent passing the master's ip and the token
+sudo apt install curl -y && curl -sfL https://get.k3s.io | K3S_URL=https://<masterFloatingIP>:6443 K3S_TOKEN="token" INSTALL_K3S_EXEC="--node-external-ip <workerFloatingIP>" sh -
+(also you ca do it after installing the entire k3s using sudo k3s agent -t <token> --server https://<masterFloatingIP>:6443 --node-external-ip <workerFloatingIP>
+)
+
+Repeats the steps to create a second openstack cloud that will simulate another cloud used during an overload to cloud burst the cluster replicas and connect its K3s nodes to the existing cluster.
+
+From the cluster master node , add labels to each node:
+sudo kubectl label nodes master1a worker1a node-type=on-prem
+sudo kubectl label nodes worker2b worker2b1 node-type=burst
+
 deploy the blueprint
 curl https://raw.githubusercontent.com/MRColorR/onehundredten/master/k8s-www-api-blueprint.yaml > k8s-www-api-blueprint.yaml && sudo kubectl apply -f k8s-www-api-blueprint.yaml
