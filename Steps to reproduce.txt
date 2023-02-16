@@ -1,7 +1,7 @@
-I install 2 ubuntu vm in hyper-v,
-I enable nested virtualization: Get-VM | ? State -eq 'Off' | Set-VMProcessor -ExposeVirtualizationExtensions $true
-I set the RAM to 10240MB both on the fixed and on the max limit of the dynamic RAM
-I enlarge the VMs disk to 64GB, then after the first boot I do the expansion:
+Install 2 ubuntu vm in hyper-v,
+Enable nested virtualization: Get-VM | ? State -eq 'Off' | Set-VMProcessor -ExposeVirtualizationExtensions $true
+Set the RAM to 10240MB (or 12288MB) both on the fixed and on the max limit of the dynamic RAM
+I enlarge the VMs disk to 64GB, then after the first boot complete the expansion:
 sudo fdisk /dev/sda
 Use the "p" command to view the current partition layout.
 Use the "d" command to delete the partition you want to resize.
@@ -24,7 +24,7 @@ I add the two machines to each other's hosts file
 sudo nano /etc/hosts and add the machine itself and its counterpart calling them devstack1 and devstack2
 
 
-I install devstack (partially following https://docs.openstack.org/devstack/latest/):
+I install devstack (partially following https://docs.openstack.org/devstack/latest/) using the :
 sudo useradd -s /bin/bash -d /opt/stack -m stack
 sudo chmod +x /opt/stack
 echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack
@@ -102,7 +102,7 @@ Add labels to each node:
 sudo kubectl label nodes master1a worker1a node-type=on-prem
 sudo kubectl label nodes worker2b worker2b1 node-type=burst
 
-Now repeats the speps to create a second openstack cloud that will simulate another cloud used during an overload to cloud burst the cluster replicas.
+Now repeats the steps to create a second openstack cloud that will simulate another cloud used during an overload to cloud burst the cluster replicas.
 
 after the instances inside openstack2, we're ready to make them join the cluster as workers
 now use the same <masterFloatingIP> used earlier to check if the instance inside (e.g. named worker1b) openstack2 can get the certificate from the instance (e.g. master1a) inside openstack1 , it can good
