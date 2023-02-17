@@ -34,28 +34,42 @@ def get_latency_stats(data):
 def get_latency_data(hpa_cpu_threshold):
     """
     Returns a list of latency values from the JMeter test results CSV file.
+    This code will loop through all the folders with names starting with REPORT_HTML{hpa_cpu_threshold} and ending with a number from 0 to 9 (i.e., REPORT_HTML50_0, REPORT_HTML50_9
     """
-    # Create the file name
-    filename = os.path.join("..", "JmeterLoadTest", "REPORT_HTML{}".format(hpa_cpu_threshold), "results.csv")
-    
-    # Load the data from the CSV file
-    data = pd.read_csv(filename)
-    
-    # Filter the data to include only the "HTTP Request API" rows
-    filtered_data = data[(data["label"] == "HTTP Request API") & (data["responseCode"] == "200")]
-
-    # Calculate the IQR of the latency data
-    q1 = filtered_data["Latency"].quantile(0.25)
-    q3 = filtered_data["Latency"].quantile(0.75)
-    iqr = q3 - q1
-    
-    # Remove any data points that fall outside of the lower and upper bounds
-    lower_bound = q1 - 1.5*iqr
-    upper_bound = q3 + 1.5*iqr
-    filtered_data = filtered_data[(filtered_data["Latency"] >= lower_bound) & (filtered_data["Latency"] <= upper_bound)]
+    data_list = []
+    for i in range(10):
+        # Create the file name
+        filename = os.path.join("..", "JmeterLoadTest", "REPORT_HTML{}_{}".format(hpa_cpu_threshold, i), "results.csv")
+        
+        try:
+            # Load the data from the CSV file
+            data = pd.read_csv(filename)
+            
+            # Filter the data to include only the "HTTP Request API" rows
+            filtered_data = data[(data["label"] == "HTTP Request API") & (data["responseCode"] == "200")]
+            
+            data_list.append(filtered_data)
+        except:
+            continue
+        
+    if data_list:
+        data = pd.concat(data_list)
+        
+        # Calculate the IQR of the latency data
+        q1 = data["Latency"].quantile(0.25)
+        q3 = data["Latency"].quantile(0.75)
+        iqr = q3 - q1
+        
+        # Remove any data points that fall outside of the lower and upper bounds
+        lower_bound = q1 - 1.5*iqr
+        upper_bound = q3 + 1.5*iqr
+        filtered_data = data[(data["Latency"] >= lower_bound) & (data["Latency"] <= upper_bound)]
+    else:
+        filtered_data = pd.DataFrame(columns=["Latency"])
     
     # Return the latency data
     return filtered_data
+
 
 
 def main():
