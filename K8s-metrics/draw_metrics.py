@@ -71,8 +71,8 @@ def main():
     # Load the data from the CSV file
     data = pd.read_csv(args.filename)
 
-    # Get the unique values of the hpa_cpu_threshold
-    unique_thresholds = data["hpa_cpu_threshold"].unique()
+    # Get the unique values of the hpa_cpu_threshold and sort it in ascending order
+    unique_thresholds = np.sort(data["hpa_cpu_threshold"].unique())
 
     fontsize=7
 
@@ -97,7 +97,7 @@ def main():
         box = filtered_data.boxplot(column="cpu_usage_avg", ax=ax[0], positions=[i], return_type="dict")
         stats = get_stats(filtered_data)
         ax[0].text(i+0.032*fontsize, stats[2]+0.45*fontsize, "max: {:.2f}".format(stats[2]), horizontalalignment='center', color='red', fontsize=fontsize)
-        ax[0].text(i+0.032*fontsize, stats[0]+0.75*fontsize, "median: {:.2f}".format(stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
+        ax[0].text(i+0.032*fontsize, stats[0]-0.75*fontsize, "median: {:.2f}".format(stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
         ax[0].text(i+0.032*fontsize, stats[1]+0.75*fontsize, "mean: {:.2f}".format(stats[1]), horizontalalignment='center', color='orange', fontsize=fontsize )
         ax[0].text(i+0.032*fontsize, stats[3]-0.80*fontsize, "min: {:.2f}".format(stats[3]), horizontalalignment='center', color='blue', fontsize=fontsize)
 
