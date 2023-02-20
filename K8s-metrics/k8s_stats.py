@@ -36,10 +36,22 @@ def get_metrics(namespace, deployment_name):
             if pod['metadata']['name'].startswith(deployment_name):
                 # Iterate over the containers in the pod
                 for container in pod["containers"]:
+                    # Retrieve CPU usage value
+                    cpu_str = container["usage"].get("cpu", 0)
                     # Add the CPU usage of the container to the total
-                    cpu_usage += float(container["usage"].get("cpu", 0).rstrip("n")) / 1000000
+                    if cpu_str.endswith("n"):
+                        cpu_usage += float(cpu_str.rstrip("n")) / 1000000
+                    else:
+                        print(f"Could not parse CPU usage value: {cpu_str}")
+                    # Retrieve Memory usage value
+                    memory_str = container["usage"].get("memory", 0)
                     # Add the memory usage of the container to the total
-                    memory_usage += float(container["usage"].get("memory", 0).rstrip("Ki")) / 1000
+                    if memory_str.endswith("Ki"):
+                        memory_usage += float(memory_str.rstrip("Ki")) / 1000
+                    elif memory_str.endswith("Mi"):
+                        memory_usage += float(memory_str.rstrip("Mi"))
+                    else:
+                        print(f"Could not parse memory usage value: {memory_str}")
         
         # Return the average CPU and memory usage
         return cpu_usage / len(resource["items"]), memory_usage / len(resource["items"])
@@ -80,6 +92,32 @@ def get_hpa_cpu_threshold(namespace, deployment_name):
         print(e)
         return None
 
+def get_replicas(namespace, deployment_name):
+    """
+    Retrieve the current replicas number for a deployment.
+    
+    Parameters:
+        namespace (str): The namespace of the deployment.
+        deployment_name (str): The name of the deployment.
+    
+    Returns:
+        int: The current replicas number.
+    """
+    # Create an instance of the AppsV1Api
+    api = client.AppsV1Api()
+    
+    try:
+        # Get the deployment
+        deployment = api.read_namespaced_deployment(
+            name=deployment_name, namespace=namespace
+        )
+        # Get the current replicas number from the deployment
+        replicas = deployment.spec.replicas
+        
+        return replicas
+    except Exception as e:
+        print(e)
+        return None
 
 def main():
     """
@@ -107,7 +145,7 @@ def main():
     config.load_kube_config(config_file=kubeconfig)
 
     # Define the headers for the output file
-    headers = ["timestamp", "cpu_usage_avg", "memory_usage_avg", "hpa_cpu_threshold"]
+    headers = ["timestamp", "cpu_usage_avg", "memory_usage_avg", "hpa_cpu_threshold", "replicas"]
     # Determine the mode in which to open the file (append or write)
     mode = "a" if args.append else "w"
     with open(filename, mode) as f:
@@ -122,8 +160,9 @@ def main():
         for i in range(iterations):
             cpu_usage, memory_usage = get_metrics(namespace, deployment_name)
             hpa_cpu_threshold = get_hpa_cpu_threshold(namespace, deployment_name)
-            # Check if CPU usage, memory usage, or HPA CPU threshold is None
-            if cpu_usage is None or memory_usage is None or hpa_cpu_threshold is None:
+            replicas = get_replicas(namespace, deployment_name)
+            # Check if CPU usage, memory usage, HPA CPU threshold, or replicas is None
+            if cpu_usage is None or memory_usage is None or hpa_cpu_threshold is None or replicas is None:
                 print("Failed to retrieve metrics, retrying in {} seconds".format(sleep_time))
             else:
                 # Create a dictionary with the metrics
@@ -131,7 +170,8 @@ def main():
                     "timestamp": time.time(),
                     "cpu_usage_avg": cpu_usage,
                     "memory_usage_avg": memory_usage,
-                    "hpa_cpu_threshold": hpa_cpu_threshold
+                    "hpa_cpu_threshold": hpa_cpu_threshold,
+                    "replicas": replicas
                 }
                 # Write the metrics to the file
                 writer.writerow(row)
