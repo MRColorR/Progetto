@@ -57,7 +57,22 @@ def get_latency_data(hpa_cpu_threshold):
             data = pd.read_csv(filename)
             
             # Filter the data to include only the "HTTP Request API" rows
-            filtered_data = data[(data["label"] == "HTTP Request API") & (data["responseCode"] == "200")]           
+            filtered_data = data[(data["label"] == "HTTP Request API") & (data["responseCode"] == "200")]
+            
+            # Calculate the IQR of the latency data
+            q1 = filtered_data["Latency"].quantile(0.25)
+            q3 = filtered_data["Latency"].quantile(0.75)
+            iqr = q3 - q1
+            
+            # Remove any data points that fall outside of the lower and upper bounds
+            lower_bound = q1 - 1.5*iqr
+            upper_bound = q3 + 1.5*iqr
+            filtered_data = filtered_data[(filtered_data["Latency"] >= lower_bound) & (filtered_data["Latency"] <= upper_bound)]
+            
+            # Save the filtered data to a CSV file
+            filtered_filename = os.path.join("..", "JmeterLoadTest", "REPORT_HTML{}_{}".format(hpa_cpu_threshold, i), "{}_{}_results.csv".format(hpa_cpu_threshold, i))
+            filtered_data.to_csv(filtered_filename, index=False)
+            
             data_list.append(filtered_data)
         except:
             continue
@@ -123,10 +138,10 @@ def main():
         # Draw the boxplot of the CPU usage
         box = filtered_data.boxplot(column="cpu_usage_avg", ax=ax[0], positions=[i], return_type="dict")
         stats = get_stats(filtered_data)
-        ax[0].text(i+0.036*fontsize, stats[2]+0.10*fontsize, "max: {:.2f}".format(stats[2]), horizontalalignment='center', color='red', fontsize=fontsize)
-        ax[0].text(i+0.04*fontsize, stats[0]-0.75*fontsize, "median: {:.2f}".format(stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
-        ax[0].text(i+0.036*fontsize, stats[1]+0.75*fontsize, "mean: {:.2f}".format(stats[1]), horizontalalignment='center', color='orange', fontsize=fontsize )
-        ax[0].text(i+0.036*fontsize, stats[3]-0.60*fontsize, "min: {:.2f}".format(stats[3]), horizontalalignment='center', color='blue', fontsize=fontsize)
+        ax[0].text(i+0.032*fontsize, stats[2]+0.45*fontsize, "max: {:.2f}".format(stats[2]), horizontalalignment='center', color='red', fontsize=fontsize)
+        ax[0].text(i+0.032*fontsize, stats[0]-0.75*fontsize, "median: {:.2f}".format(stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
+        ax[0].text(i+0.032*fontsize, stats[1]+0.75*fontsize, "mean: {:.2f}".format(stats[1]), horizontalalignment='center', color='orange', fontsize=fontsize )
+        ax[0].text(i+0.032*fontsize, stats[3]-0.80*fontsize, "min: {:.2f}".format(stats[3]), horizontalalignment='center', color='blue', fontsize=fontsize)
 
         # Calculate the mean value for the CPU usage
         cpu_mean = filtered_data["cpu_usage_avg"].mean()
@@ -160,10 +175,10 @@ def main():
         # Draw the boxplot of the memory usage
         box = filtered_data.boxplot(column="memory_usage_avg", ax=ax[1], positions=[i], return_type="dict")
         stats = get_stats(filtered_data)
-        ax[1].text(i+0.036*fontsize, stats[6]+0.004*fontsize, "max: {:.2f}".format(stats[6]), horizontalalignment='center', color='red', fontsize=fontsize)
-        ax[1].text(i+0.04*fontsize, stats[4]+0.028*fontsize, "median: {:.2f}".format(stats[4]), horizontalalignment='center', color='green', fontsize=fontsize)
-        ax[1].text(i+0.036*fontsize, stats[5]-0.048*fontsize, "mean: {:.2f}".format(stats[5]), horizontalalignment='center', color='orange', fontsize=fontsize)
-        ax[1].text(i+0.036*fontsize, stats[7]-0.024*fontsize, "min: {:.2f}".format(stats[7]), horizontalalignment='center', color='blue', fontsize=fontsize)
+        ax[1].text(i+0.032*fontsize, stats[6]+0.012*fontsize, "max: {:.2f}".format(stats[6]), horizontalalignment='center', color='red', fontsize=fontsize)
+        ax[1].text(i+0.032*fontsize, stats[4]+0.028*fontsize, "median: {:.2f}".format(stats[4]), horizontalalignment='center', color='green', fontsize=fontsize)
+        ax[1].text(i+0.032*fontsize, stats[5]-0.048*fontsize, "mean: {:.2f}".format(stats[5]), horizontalalignment='center', color='orange', fontsize=fontsize)
+        ax[1].text(i+0.032*fontsize, stats[7]-0.024*fontsize, "min: {:.2f}".format(stats[7]), horizontalalignment='center', color='blue', fontsize=fontsize)
 
         # Calculate the mean value for the memory usage
         mem_mean = filtered_data["memory_usage_avg"].mean()
@@ -198,10 +213,10 @@ def main():
             box = latency_data.boxplot(column="Latency", ax=latency_ax, positions=[i], return_type="dict")
             # Add the statistics to the plot
             latency_stats = get_latency_stats(latency_data)
-            latency_ax.text(i+0.036*fontsize, latency_stats[2]+0.34*fontsize, "max: {:.0f} ms".format(latency_stats[2]), horizontalalignment='center', color='red', fontsize=fontsize)
-            latency_ax.text(i+0.04*fontsize, latency_stats[0]-0.94*fontsize, "median: {:.0f} ms".format(latency_stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
-            latency_ax.text(i+0.036*fontsize, latency_stats[1]+0.99*fontsize, "mean: {:.0f} ms".format(latency_stats[1]), horizontalalignment='center', color='orange', fontsize=fontsize)
-            latency_ax.text(i+0.036*fontsize, latency_stats[3]-0.99*fontsize, "min: {:.0f} ms".format(latency_stats[3]), horizontalalignment='center', color='blue', fontsize=fontsize)
+            latency_ax.text(i+0.032*fontsize, latency_stats[2]+0.75*fontsize, "max: {:.0f} ms".format(latency_stats[2]), horizontalalignment='center', color='red', fontsize=fontsize)
+            latency_ax.text(i+0.032*fontsize, latency_stats[0]-0.68*fontsize, "median: {:.0f} ms".format(latency_stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
+            latency_ax.text(i+0.032*fontsize, latency_stats[1]+0.68*fontsize, "mean: {:.0f} ms".format(latency_stats[1]), horizontalalignment='center', color='orange', fontsize=fontsize)
+            latency_ax.text(i+0.032*fontsize, latency_stats[3]-0.98*fontsize, "min: {:.0f} ms".format(latency_stats[3]), horizontalalignment='center', color='blue', fontsize=fontsize)
 
             # Calculate the mean value for the latency
             latency_mean = latency_data["Latency"].mean()
@@ -240,10 +255,10 @@ def main():
             # Draw the boxplot of the replicas
             box = filtered_data.boxplot(column="replicas", ax=replicas_ax, positions=[i], return_type="dict")
             stats = get_replicas_stats(filtered_data)
-            replicas_ax.text(i+0.036*fontsize, stats[2]+0.012*fontsize, "max: {:.0f}".format(stats[2]), horizontalalignment='center', color='red', fontsize=fontsize)
-            replicas_ax.text(i+0.04*fontsize, stats[0]-0.012*fontsize, "median: {:.0f}".format(stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
-            replicas_ax.text(i+0.036*fontsize, stats[1]+0.030*fontsize, "mean: {:.0f}".format(stats[1]), horizontalalignment='center', color='orange', fontsize=fontsize)
-            replicas_ax.text(i+0.036*fontsize, stats[3]-0.011*fontsize, "min: {:.0f}".format(stats[3]), horizontalalignment='center', color='blue', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[2]+0.012*fontsize, "max: {:.0f}".format(stats[2]), horizontalalignment='center', color='red', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[0]-0.032*fontsize, "median: {:.0f}".format(stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[1]+0.032*fontsize, "mean: {:.0f}".format(stats[1]), horizontalalignment='center', color='orange', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[3]-0.012*fontsize, "min: {:.0f}".format(stats[3]), horizontalalignment='center', color='blue', fontsize=fontsize)
 
             # Calculate the mean value for the replicas
             replicas_mean = filtered_data["replicas"].mean()
