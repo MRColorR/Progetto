@@ -18,12 +18,18 @@ def get_stats(data):
     mem_max = data["memory_usage_avg"].max()
     mem_min = data["memory_usage_avg"].min()
 
+    return [cpu_median, cpu_mean, cpu_max, cpu_min, mem_median, mem_mean, mem_max, mem_min]
+
+def get_replicas_stats(data):
+    """
+    Calculate the median, mean, max, and min of the replicas.
+    """
     replicas_median = data["replicas"].median()
     replicas_mean = data["replicas"].mean()
     replicas_max = data["replicas"].max()
     replicas_min = data["replicas"].min()
 
-    return [cpu_median, cpu_mean, cpu_max, cpu_min, mem_median, mem_mean, mem_max, mem_min, replicas_median, replicas_mean, replicas_max, replicas_min]
+    return [replicas_median, replicas_mean, replicas_max, replicas_min]
 
 def get_latency_stats(data):
     """
@@ -232,11 +238,11 @@ def main():
 
             # Draw the boxplot of the replicas
             box = filtered_data.boxplot(column="replicas", ax=replicas_ax, positions=[i], return_type="dict")
-            stats = get_stats(filtered_data)
-            replicas_ax.text(i+0.032*fontsize, stats[10]+0.012*fontsize, "max: {:.0f}".format(stats[10]), horizontalalignment='center', color='red', fontsize=fontsize)
-            replicas_ax.text(i+0.032*fontsize, stats[8]-0.032*fontsize, "median: {:.0f}".format(stats[8]), horizontalalignment='center', color='green', fontsize=fontsize)
-            replicas_ax.text(i+0.032*fontsize, stats[9]+0.032*fontsize, "mean: {:.0f}".format(stats[9]), horizontalalignment='center', color='orange', fontsize=fontsize)
-            replicas_ax.text(i+0.032*fontsize, stats[11]-0.012*fontsize, "min: {:.0f}".format(stats[11]), horizontalalignment='center', color='blue', fontsize=fontsize)
+            stats = get_replicas_stats(filtered_data)
+            replicas_ax.text(i+0.032*fontsize, stats[2]+0.012*fontsize, "max: {:.0f}".format(stats[2]), horizontalalignment='center', color='red', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[0]-0.032*fontsize, "median: {:.0f}".format(stats[0]), horizontalalignment='center', color='green', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[1]+0.032*fontsize, "mean: {:.0f}".format(stats[1]), horizontalalignment='center', color='orange', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[3]-0.012*fontsize, "min: {:.0f}".format(stats[3]), horizontalalignment='center', color='blue', fontsize=fontsize)
 
             # Calculate the mean value for the replicas
             replicas_mean = filtered_data["replicas"].mean()
