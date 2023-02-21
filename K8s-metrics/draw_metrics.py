@@ -18,7 +18,12 @@ def get_stats(data):
     mem_max = data["memory_usage_avg"].max()
     mem_min = data["memory_usage_avg"].min()
 
-    return [cpu_median, cpu_mean, cpu_max, cpu_min, mem_median, mem_mean, mem_max, mem_min]
+    replicas_median = data["replicas"].median()
+    replicas_mean = data["replicas"].mean()
+    replicas_max = data["replicas"].max()
+    replicas_min = data["replicas"].min()
+
+    return [cpu_median, cpu_mean, cpu_max, cpu_min, mem_median, mem_mean, mem_max, mem_min, replicas_median, replicas_mean, replicas_max, replicas_min]
 
 def get_latency_stats(data):
     """
@@ -80,6 +85,7 @@ def main():
     parser = argparse.ArgumentParser(description="Draw boxplots of the CPU and memory usage")
     parser.add_argument("--filename", type=str, default="deployment_metrics.csv", help="The input file name")
     parser.add_argument("--latency", action='store_true', help="Draw boxplots of the HTTP Request API latencies")
+    parser.add_argument("--replicas", action='store_true', help="Draw boxplots of the HTTP Request API replicas")
     args = parser.parse_args()
 
     # Load the data from the CSV file
@@ -91,7 +97,7 @@ def main():
     fontsize=7
 
     # Draw the boxplots of the CPU usage
-    fig, ax = plt.subplots(2+ args.latency, 1, figsize=(10, 10))
+    fig, ax = plt.subplots(2 + args.latency + args.replicas, 1, figsize=(12, 12))
     cpu_thresholds = []
     cpu_means = []
     for i, hpa_cpu_threshold in enumerate(unique_thresholds):
@@ -206,9 +212,51 @@ def main():
         # Set the title and labels of the latency boxplot
         latency_ax.set_title("HTTP Request API Latency")
         latency_ax.set_ylabel("Latency (ms)")
+
+    if args.replicas:
+        # Draw the boxplots of the replicas
+        replicas_ax = ax[3] if args.latency else None
+        replicas_thresholds = []
+        replicas_means = []
+        for i, hpa_cpu_threshold in enumerate(unique_thresholds):
+            # Filter the data for the current hpa_cpu_threshold
+            filtered_data = data[data["hpa_cpu_threshold"] == hpa_cpu_threshold]
+
+            # Calculate the interquartile range (IQR) and remove any data points that fall outside of the lower and upper bounds, defined as Q1 - 1.5IQR and Q3 + 1.5IQR, respectively
+            replicas_q75 = filtered_data["replicas"].quantile(0.75)
+            replicas_q25 = filtered_data["replicas"].quantile(0.25)
+            replicas_iqr = replicas_q75 - replicas_q25
+            replicas_min = replicas_q25 - 1.5 * replicas_iqr
+            replicas_max = replicas_q75 + 1.5 * replicas_iqr
+            filtered_data = filtered_data[(filtered_data["replicas"] >= replicas_min) & (filtered_data["replicas"] <= replicas_max)]
+
+            # Draw the boxplot of the replicas
+            box = filtered_data.boxplot(column="replicas", ax=replicas_ax, positions=[i], return_type="dict")
+            stats = get_stats(filtered_data)
+            replicas_ax.text(i+0.032*fontsize, stats[10]+0.012*fontsize, "max: {:.0f}".format(stats[10]), horizontalalignment='center', color='red', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[8]-0.032*fontsize, "median: {:.0f}".format(stats[8]), horizontalalignment='center', color='green', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[9]+0.032*fontsize, "mean: {:.0f}".format(stats[9]), horizontalalignment='center', color='orange', fontsize=fontsize)
+            replicas_ax.text(i+0.032*fontsize, stats[11]-0.012*fontsize, "min: {:.0f}".format(stats[11]), horizontalalignment='center', color='blue', fontsize=fontsize)
+
+            # Calculate the mean value for the replicas
+            replicas_mean = filtered_data["replicas"].mean()
+            replicas_thresholds.append(i)
+            replicas_means.append(replicas_mean)
+
+        # Add the line connecting the mean values of the replicas
+        replicas_ax.plot(replicas_thresholds, replicas_means, marker='o', color='orange')
+
+        # Set the x-axis labels
+        replicas_ax.set_xticklabels(unique_thresholds)
+        replicas_ax.set_xticks(range(len(unique_thresholds)))
+        replicas_ax.set_xticklabels(["hpa_tresh: {}".format(int(x)) for x in unique_thresholds])
+
+        # Set the title and labels of the replicas boxplot
+        replicas_ax.set_title("Replicas")
+        replicas_ax.set_ylabel("Number of replicas")
         
-        # Set the layout of the subplots
-        fig.tight_layout(rect=[0, 0, 1, 0.95])
+    # Set the layout of the subplots
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
 
     # Save the figure as a SVG file
     plt.savefig("deployment_metrics_summary.svg")
